@@ -46,17 +46,12 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = "" }) => {
 const ServiceCard = ({ icon: Icon, title, description, delay }) => (
   <FadeInSection delay={delay} className="h-full">
     <div className="relative h-full group rounded-[24px] p-[1px] overflow-hidden">
+        {/* Efecto de brillo que pasa una sola vez */}
+        <div className="absolute top-0 left-0 w-full h-full bg-transparent overflow-hidden rounded-[23px] z-10">
+             <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent to-white/30 opacity-80 -skew-x-12 transform -translate-x-full animate-[shine-once_2.5s_ease-out] " style={{ animationDelay: `${delay + 200}ms` }} />
+        </div>
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-indigo-500 to-transparent opacity-70 animate-pulse-slow group-hover:opacity-100 transition-opacity" />
-        <div className="relative h-full bg-slate-950/90 backdrop-blur-xl rounded-[23px] p-8 flex flex-col overflow-hidden"> {/* overflow-hidden es clave aquí */}
-            {/* Efecto de Brillo (shine) - Pasa por encima de todo */}
-            <div 
-                className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-white/0 via-white/30 to-white/0 -skew-x-[25deg] z-20 pointer-events-none"
-                style={{
-                    animation: `shine-once 1.2s ease-out ${parseInt(delay) + 400}ms forwards`,
-                    transform: 'translateX(-150%)', // Estado inicial
-                }}
-            />
-            {/* Contenido de la tarjeta */}
+        <div className="relative h-full bg-slate-950/90 backdrop-blur-xl rounded-[23px] p-8 flex flex-col">
             <div className="w-14 h-14 bg-blue-500/20 flex items-center justify-center rounded-2xl mb-6 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                 <Icon className="w-7 h-7 text-blue-400" />
             </div>
@@ -141,6 +136,7 @@ export default function App() {
       .animate-slide-in-bottom { animation: slideInBottom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
       @keyframes slideInBottomRight { from { opacity: 0; transform: translate(20px, 20px) scale(0.95); } to { opacity: 1; transform: translate(0, 0) scale(1); } }
       .animate-slide-in-br { animation: slideInBottomRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      /* Animación de brillo */
       @keyframes shine-once {
         0% { transform: translateX(-150%); }
         100% { transform: translateX(350%); } /* Asegura que cruce toda la tarjeta */
@@ -156,8 +152,8 @@ export default function App() {
       {/* HEADER */}
       <header className={`fixed w-full top-0 z-40 transition-all duration-300 ${scrolled ? 'bg-slate-950/95 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent py-6'}`}>
         <div className="container mx-auto px-4 flex justify-center md:justify-between items-center relative">
-          {/* LOGO NUEVO: URL actualizada y sin filtros de color */}
-          <img src="spfblanco.png" alt="SPF Logistics" className="h-10 md:h-12 w-auto transition-all duration-500" />
+          {/* LOGO NUEVO: URL actualizada y efecto de "glow" al pasar el mouse */}
+          <img src="/spfblanco.png" alt="SPF Logistics" className="h-10 md:h-12 w-auto transition-all duration-300 cursor-pointer hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
           <nav className="hidden md:flex items-center gap-8 font-medium text-sm text-white tracking-wider">
             <a href="#home" className="hover:text-blue-400 transition-colors">INICIO</a>
             <a href="#about" className="hover:text-blue-400 transition-colors">NOSOTROS</a>
@@ -197,13 +193,11 @@ export default function App() {
 
       {/* WHO WE ARE (Con Marca de Agua Metatron) */}
       <section id="about" className="py-28 bg-white relative overflow-hidden">
-          <div className="container mx-auto px-4 relative z-10">
-              {/* Marca de Agua Metatron */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-                  {/* URL Actualizada para "Quienes Somos" */}
-                  <img src="https://static.vecteezy.com/system/resources/thumbnails/049/563/464/small/metatron-s-cube-symbol-isolated-on-transparent-background-sacred-geometry-symbol-concept-png.png" alt="" className="w-[800px] h-auto" />
-              </div>
-              
+           {/* Marca de Agua Metatron */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
+              <img src="https://i.postimg.cc/Y9yW3bQ5/logo1.jpg" alt="" className="w-[600px] h-auto" />
+          </div>
+          <div className="container mx-auto px-4 relative">
               <FadeInSection className="text-center max-w-3xl mx-auto mb-16">
                   <span className="text-blue-600 font-bold tracking-widest uppercase mb-4 block">Quiénes Somos</span>
                   <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-8 leading-tight">MÁS QUE UN TRABAJO, ES UNA MISIÓN.</h2>
@@ -211,7 +205,7 @@ export default function App() {
                       <strong>SPF Logistics</strong> es un socio de servicios de entrega líder que opera desde Wichita, KS. Conectamos a las personas con lo que necesitan, cuando lo necesitan. Nuestra filosofía es simple: cuidamos a nuestros conductores y ellos cuidan a los clientes.
                   </p>
               </FadeInSection>
-              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
+              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch z-10 relative">
                   <FadeInSection delay="0">
                       <InfoCard icon={Shield} title="Seguridad Primero" description="Nuestra prioridad absoluta. Vehículos mantenidos y protocolos rigurosos para que llegues a casa seguro cada día." />
                   </FadeInSection>
@@ -227,10 +221,8 @@ export default function App() {
 
       {/* SERVICES (Sin Marca de Agua, con efecto brillo) */}
       <section id="services" className="py-32 bg-slate-950 relative overflow-hidden">
-        
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-[#050a1f] to-slate-900 animate-gradient-slow" />
         <div className="absolute inset-0 opacity-[0.15] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900 via-transparent to-transparent" />
-        {/* Marca de Agua ELIMINADA */}
         
         <div className="container mx-auto px-4 relative z-10">
             <div className="text-center mb-20 max-w-3xl mx-auto">
@@ -287,7 +279,7 @@ export default function App() {
                             <li className="flex items-center gap-3 text-slate-800 font-bold"><CheckCircle className="text-blue-500" /> Semanas Laborales Consistentes de 4 Días</li>
                             <li className="flex items-center gap-3 text-slate-800 font-bold"><CheckCircle className="text-blue-500" /> Paquete Completo de Beneficios de Salud</li>
                         </ul>
-                         {/* BOTÓN CAMBIADO A AZUL (primary={false}) */}
+                         {/* BOTÓN AZUL ACTUALIZADO */}
                          <LedButton onClick={() => setIsApplyModalOpen(true)} primary={false} className="w-full md:w-auto">
                             INICIAR APLICACIÓN AHORA <ArrowRight size={20} className="ml-2" />
                         </LedButton>
@@ -305,8 +297,8 @@ export default function App() {
         <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-3 gap-12 items-center justify-items-center md:justify-items-start mb-12">
                 <div className="flex flex-col items-center md:items-start">
-                     {/* LOGO NUEVO: URL actualizada y sin 'invert' porque ya es blanco */}
-                     <img src="spfblanco.png" alt="SPF Logistics" className="h-12 mb-6 opacity-90" />
+                     {/* LOGO NUEVO: URL actualizada y efecto de "glow" al pasar el mouse */}
+                     <img src="/spfblanco.png" alt="SPF Logistics" className="h-12 mb-6 opacity-90 transition-all duration-300 cursor-pointer hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
                      <p className="max-w-xs mx-auto md:mx-0">Entregando excelencia, un paquete a la vez. Orgulloso Socio de Servicios de Entrega de Amazon en Wichita, KS.</p>
                 </div>
                 <div className="flex flex-col items-center md:items-start">
@@ -353,7 +345,6 @@ export default function App() {
           <div className="md:hidden fixed bottom-4 left-4 right-4 bg-slate-950/90 backdrop-blur-xl p-2 rounded-full flex justify-between items-center border border-white/10 shadow-2xl z-[70] px-6">
             <a href="#home" className="flex flex-col items-center text-slate-400 hover:text-blue-500 transition-colors"><Home size={24} /></a>
             <LedButton onClick={() => setIsApplyModalOpen(true)} primary={false} className="scale-95 mx-2 shadow-lg shadow-blue-900/30">POSTULARSE</LedButton>
-            {/* CORRECCIÓN DE ERROR DE SINTAXIS: */}
             <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className={`flex flex-col items-center transition-colors ${isMobileMenuOpen ? 'text-blue-500' : 'text-slate-400'}`}>{isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}</button>
           </div>
       </>
@@ -408,15 +399,29 @@ export default function App() {
         </div>
       )}
 
+      {/* MODAL DEL MAPA ACTUALIZADO */}
       {isMapModalOpen && (
         <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[100] flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && setIsMapModalOpen(false)}>
              <div className="bg-slate-900 p-2 rounded-[2.5rem] w-full max-w-4xl relative animate-[scaleIn_0.3s_ease-out] border border-white/10 shadow-2xl">
                 <button onClick={() => setIsMapModalOpen(false)} className="absolute top-6 right-6 bg-white text-black w-12 h-12 rounded-full z-20 flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><X size={24}/></button>
                 <div className="relative h-[600px] rounded-[2rem] overflow-hidden">
-                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d101196.0817244946!2d-97.42842614179687!3d37.7318951!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87bae3b7c4e67f7b%3A0x940b6d7f36344996!2sWichita%2C%2A0KS!5e0!3m2!1sen!2sus" width="100%" height="100%" style={{border:0, filter: 'invert(90%) hue-rotate(180deg) contrast(1.2) saturate(0.5)'}} allowFullScreen="" loading="lazy"></iframe>
+                     {/* NUEVO SRC DEL MAPA */}
+                     <iframe 
+                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3154.4284647024!2d-97.23364828857149!3d37.75655051309275!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87bafde4d851c1ab%3A0xa23849e674b940ba!2s4044%20N%20Toben%20St%2C%20Wichita%2C%20KS%2067226%2C%20EE.%20UU.!5e0!3m2!1ses!2sar!4v1762884031627!5m2!1ses!2sar" 
+                         width="100%" 
+                         height="100%" 
+                         style={{border:0, filter: 'invert(90%) hue-rotate(180deg) contrast(1.2) saturate(0.5)'}} 
+                         allowFullScreen="" 
+                         loading="lazy" 
+                         referrerPolicy="no-referrer-when-downgrade">
+                     </iframe>
                      <div className="absolute bottom-10 left-0 right-0 flex justify-center pointer-events-none">
                          <div className="pointer-events-auto">
-                            <LedButton onClick={() => window.open("https://www.google.com/maps/dir//Wichita,+KS/", "_blank")} primary={false} className="scale-110 shadow-2xl shadow-black/50">
+                            {/* NUEVO LINK DE DIRECCIONES */}
+                            <LedButton 
+                                onClick={() => window.open("https://www.google.com/maps/dir//4044+N+Toben+St,+Wichita,+KS+67226/", "_blank")} 
+                                primary={false} 
+                                className="scale-110 shadow-2xl shadow-black/50">
                                 <Navigation size={20} /> CÓMO LLEGAR
                             </LedButton>
                          </div>
