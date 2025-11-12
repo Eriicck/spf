@@ -42,27 +42,46 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = "" }) => {
   return <span ref={ref}>{count}{suffix}</span>;
 };
 
-// Tarjeta de Servicio (Con efecto de brillo único)
+// Tarjeta de Servicio (NUEVO ESTILO, Fondo Claro)
 const ServiceCard = ({ icon: Icon, title, description, delay }) => (
   <FadeInSection delay={delay} className="h-full">
-    <div className="relative h-full group rounded-[24px] p-[1px] overflow-hidden">
-        {/* Efecto de brillo que pasa una sola vez */}
-        <div className="absolute top-0 left-0 w-full h-full bg-transparent overflow-hidden rounded-[23px] z-10">
-             <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent to-white/30 opacity-80 -skew-x-12 transform -translate-x-full animate-[shine-once_2.5s_ease-out] " style={{ animationDelay: `${delay + 200}ms` }} />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-indigo-500 to-transparent opacity-70 animate-pulse-slow group-hover:opacity-100 transition-opacity" />
-        <div className="relative h-full bg-slate-950/90 backdrop-blur-xl rounded-[23px] p-8 flex flex-col">
-            <div className="w-14 h-14 bg-blue-500/20 flex items-center justify-center rounded-2xl mb-6 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                <Icon className="w-7 h-7 text-blue-400" />
+    {/* Estilo limpio, fondo blanco, borde azul al pasar el mouse */}
+    <div className="relative h-full group bg-white rounded-xl p-6 shadow-xl border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:border-blue-500">
+        <div className="flex flex-col">
+            <div className="w-16 h-16 bg-blue-500/10 flex items-center justify-center rounded-xl mb-4 border border-blue-500/20 transition-transform duration-300 group-hover:scale-110 group-hover:bg-blue-500 group-hover:shadow-lg group-hover:shadow-blue-500/30">
+                <Icon className="w-8 h-8 text-blue-600 transition-colors duration-300 group-hover:text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-4">{title}</h3>
-            <p className="text-slate-400 leading-relaxed flex-grow">{description}</p>
+            <h3 className="text-2xl font-black text-slate-900 mb-2">{title}</h3>
+            <p className="text-slate-600 leading-relaxed flex-grow">{description}</p>
         </div>
     </div>
   </FadeInSection>
 );
 
-// Tarjeta "Quiénes Somos" con efecto LED pulsante MÁS NOTABLE
+// NUEVO COMPONENTE: Tarjeta de Foto de Personal (Anonimizada - Fondo Blanco)
+const StaffPhotoCard = ({ imgSrc, description, delay }) => (
+  <FadeInSection delay={delay} className="text-center">
+    {/* Fondo Blanco aplicado a la tarjeta, con shadow y lift */}
+    <div className="bg-white p-2 rounded-2xl shadow-lg h-full transform transition-transform duration-300 hover:scale-[1.03] hover:shadow-2xl">
+        <div className="relative group overflow-hidden rounded-xl aspect-[3/4]">
+          {/* Borde sutil amarillo Amazon al pasar el mouse */}
+          <div className="absolute inset-0 border-4 border-transparent group-hover:border-amber-500 transition-all duration-300 z-10 rounded-xl" />
+          <img 
+            src={imgSrc} 
+            alt="Miembro del equipo de SPF Logistics" 
+            className="w-full h-full object-cover rounded-xl transform group-hover:scale-110 transition-transform duration-300"
+          />
+          {/* Overlay sutil */}
+          <div className="absolute inset-0 bg-black/10 transition-opacity group-hover:opacity-0 rounded-xl" />
+        </div>
+        {/* Solo la descripción genérica */}
+        <p className="text-slate-600 text-sm mt-3 font-semibold">{description}</p>
+    </div>
+  </FadeInSection>
+);
+
+
+// Tarjeta "Quiénes Somos" (InfoCard reutilizada)
 const InfoCard = ({ icon: Icon, title, description }) => (
     <div className="relative group rounded-3xl p-[2px] overflow-hidden h-full transform hover:-translate-y-2 transition-all duration-300">
         {/* Borde LED más visible */}
@@ -136,11 +155,6 @@ export default function App() {
       .animate-slide-in-bottom { animation: slideInBottom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
       @keyframes slideInBottomRight { from { opacity: 0; transform: translate(20px, 20px) scale(0.95); } to { opacity: 1; transform: translate(0, 0) scale(1); } }
       .animate-slide-in-br { animation: slideInBottomRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-      /* Animación de brillo */
-      @keyframes shine-once {
-        0% { transform: translateX(-150%); }
-        100% { transform: translateX(350%); } /* Asegura que cruce toda la tarjeta */
-      }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
@@ -150,10 +164,11 @@ export default function App() {
     <div className="font-sans text-slate-900 bg-slate-50 overflow-x-hidden selection:bg-blue-500/30">
 
       {/* HEADER */}
-      <header className={`fixed w-full top-0 z-40 transition-all duration-300 ${scrolled ? 'bg-slate-950/95 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent py-6'}`}>
+      {/* CAMBIO FLICKER: 'absolute' en móvil, 'md:fixed' en desktop */}
+      <header className={`absolute md:fixed w-full top-0 z-40 transition-all duration-300 bg-transparent py-6 ${scrolled ? 'md:bg-slate-950/95 md:backdrop-blur-md md:py-3 md:shadow-lg' : ''}`}>
         <div className="container mx-auto px-4 flex justify-center md:justify-between items-center relative">
-          {/* LOGO NUEVO: URL actualizada y efecto de "glow" al pasar el mouse */}
-          <img src="/spfblanco.png" alt="SPF Logistics" className="h-10 md:h-12 w-auto transition-all duration-300 cursor-pointer hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
+          {/* TAMAÑO MÓVIL AUMENTADO */}
+          <img src="/spfblanco.png" alt="SPF Logistics" className="h-12 md:h-14 w-auto transition-all duration-300 cursor-pointer hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
           <nav className="hidden md:flex items-center gap-8 font-medium text-sm text-white tracking-wider">
             <a href="#home" className="hover:text-blue-400 transition-colors">INICIO</a>
             <a href="#about" className="hover:text-blue-400 transition-colors">NOSOTROS</a>
@@ -172,8 +187,9 @@ export default function App() {
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent" />
         <div className="container mx-auto px-4 relative z-10 mt-10 md:mt-20">
           <div className="max-w-4xl" data-aos="fade-right">
-            <div className="inline-flex items-center gap-3 py-2 px-4 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-blue-300 text-sm font-bold uppercase tracking-widest mb-8">
-              <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span></span>
+            {/* CAMBIO: "Píldora" con acento amarillo de Amazon */}
+            <div className="inline-flex items-center gap-3 py-2 px-4 rounded-full bg-amber-400/10 backdrop-blur-md border border-amber-400/20 text-amber-300 text-sm font-bold uppercase tracking-widest mb-8">
+              <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span></span>
               Socio Oficial DSP de Amazon • Wichita, KS
             </div>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-none mb-8 tracking-tight drop-shadow-2xl">
@@ -191,50 +207,90 @@ export default function App() {
         </div>
       </section>
 
-      {/* WHO WE ARE (Con Marca de Agua Metatron) */}
-      <section id="about" className="py-28 bg-white relative overflow-hidden">
-           {/* Marca de Agua Metatron */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
-              <img src="https://i.postimg.cc/Y9yW3bQ5/logo1.jpg" alt="" className="w-[600px] h-auto" />
-          </div>
+      {/* WHO WE ARE (NUEVO LAYOUT: Estilo Carreras con Imagen de Fondo sutil) */}
+      <section id="about" className="py-28 bg-gray-50 relative overflow-hidden">
           <div className="container mx-auto px-4 relative">
-              <FadeInSection className="text-center max-w-3xl mx-auto mb-16">
-                  <span className="text-blue-600 font-bold tracking-widest uppercase mb-4 block">Quiénes Somos</span>
-                  <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-8 leading-tight">MÁS QUE UN TRABAJO, ES UNA MISIÓN.</h2>
-                  <p className="text-xl text-slate-600 leading-relaxed">
-                      <strong>SPF Logistics</strong> es un socio de servicios de entrega líder que opera desde Wichita, KS. Conectamos a las personas con lo que necesitan, cuando lo necesitan. Nuestra filosofía es simple: cuidamos a nuestros conductores y ellos cuidan a los clientes.
-                  </p>
-              </FadeInSection>
-              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch z-10 relative">
-                  <FadeInSection delay="0">
-                      <InfoCard icon={Shield} title="Seguridad Primero" description="Nuestra prioridad absoluta. Vehículos mantenidos y protocolos rigurosos para que llegues a casa seguro cada día." />
-                  </FadeInSection>
-                   <FadeInSection delay="150">
-                      <InfoCard icon={TrendingUp} title="Crecimiento Real" description="Oportunidades claras de ascenso a roles de liderazgo y despacho. Tu carrera avanza con nosotros." />
-                  </FadeInSection>
-                   <FadeInSection delay="300">
-                      <InfoCard icon={Heart} title="Cultura de Respeto" description="Valoramos cada voz. Un ambiente de trabajo positivo donde te sentirás parte de una verdadera familia." />
-                  </FadeInSection>
+              
+              {/* Contenedor principal con fondo oscuro y borde redondeado para dar presencia */}
+              <div className="grid lg:grid-cols-5 gap-10 lg:gap-0 items-center bg-slate-900 shadow-2xl rounded-3xl overflow-hidden">
+                  
+                  {/* Columna Izquierda: Texto (3/5 del ancho) */}
+                  <div className="lg:col-span-3 p-8 md:p-12 text-white order-2 lg:order-1"> {/* order-2 en móvil */}
+                      <FadeInSection delay="0" className="flex flex-col">
+                          <span className="text-blue-400 font-bold tracking-widest uppercase mb-4 block">Quiénes Somos</span>
+                          <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">LLEVAMOS TUS PAQUETES, IMPULSAMOS TU CARRERA.</h2>
+                          <p className="text-lg text-slate-300 leading-relaxed mb-4">
+                              <strong>SPF Logistics</strong> es un Socio de Servicios de Entrega (DSP) de Amazon. Operamos con los más altos estándares en Wichita, KS.
+                          </p>
+                          <p className="text-lg text-slate-400 leading-relaxed">
+                              Nuestra misión es la seguridad y la entrega a tiempo. Proveemos rutas estables, flotas nuevas y un equipo de apoyo que te pone primero.
+                          </p>
+                      </FadeInSection>
+                      {/* Detalles de Valor */}
+                      <div className="grid grid-cols-2 mt-10 gap-x-8 gap-y-6">
+                            <div className="flex items-center gap-3"><Shield className="w-5 h-5 text-blue-400" /><span className="font-semibold text-sm text-slate-300">Seguridad Prioritaria</span></div>
+                            <div className="flex items-center gap-3"><TrendingUp className="w-5 h-5 text-blue-400" /><span className="font-semibold text-sm text-slate-300">Oportunidad de Crecimiento</span></div>
+                            <div className="flex items-center gap-3"><Clock className="w-5 h-5 text-blue-400" /><span className="font-semibold text-sm text-slate-300">Rutas Consistentes</span></div>
+                      </div>
+                  </div>
+
+                  {/* Columna Derecha: Imagen de Fondo sutil y Corte Diagonal */}
+                  <div className="lg:col-span-2 relative w-full h-full min-h-[300px] lg:min-h-full order-1 lg:order-2"> {/* order-1 en móvil */}
+                      {/* Imagen de Fondo (textura geométrica) */}
+                      <div className="absolute inset-0 bg-cover bg-center opacity-[0.15]" style={{ backgroundImage: `url('/logo-facebook.jpg')` }} />
+                      {/* Overlay azul oscuro para mantener el estilo de la caja */}
+                      <div className="absolute inset-0 bg-slate-900/95" /> 
+
+                      {/* Imagen de Contenido (Conductor) con CORTE DIAGONAL */}
+                      <img 
+                          src="6.jpg" // <-- ¡AQUÍ PUEDES CAMBIAR LA IMAGEN!
+                          alt="Conductor de Amazon en un campo" 
+                          className="w-full h-full object-cover transform scale-[1.05] filter brightness-[0.8] relative z-10"
+                          style={{
+                              // Aplica el corte diagonal a la imagen en desktop. 
+                              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)',
+                          }}
+                      />
+                      {/* Estilos específicos para el corte diagonal en desktop */}
+                      <style jsx="true">{`
+                        @media (min-width: 1024px) {
+                            #about .lg\\:col-span-2 img {
+                                clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+                            }
+                        }
+                      `}</style>
+                  </div>
+
               </div>
           </div>
       </section>
 
-      {/* SERVICES (Sin Marca de Agua, con efecto brillo) */}
-      <section id="services" className="py-32 bg-slate-950 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-[#050a1f] to-slate-900 animate-gradient-slow" />
-        <div className="absolute inset-0 opacity-[0.15] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900 via-transparent to-transparent" />
+      {/* SERVICES (NUEVA ESTÉTICA Y SIMPLIFICACIÓN) */}
+      <section id="services" className="py-28 bg-gray-50 relative overflow-hidden">
+        
+        {/* Marcador de Estilo Geométrico/Grid */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+            <img src="/logo-facebook.jpg" alt="" className="w-full h-full object-cover opacity-50 filter grayscale contrast-150" />
+        </div>
         
         <div className="container mx-auto px-4 relative z-10">
-            <div className="text-center mb-20 max-w-3xl mx-auto">
-                <span className="text-blue-400 font-bold tracking-widest uppercase mb-4 block">Lo Que Hacemos Mejor</span>
-                <h2 className="text-4xl md:text-5xl font-black text-white mb-6">LOGÍSTICA DE PRECISIÓN</h2>
-                <p className="text-slate-400 text-lg">Soluciones de entrega a medida ejecutadas con precisión militar y cuidado humano.</p>
+            {/* Título de Servicios */}
+            <div className="text-center mb-16 max-w-3xl mx-auto">
+                <span className="text-blue-600 font-bold tracking-widest uppercase mb-4 block">Lo Que Hacemos Mejor</span>
+                <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">LOGÍSTICA DE PRECISIÓN</h2>
+                <p className="text-slate-600 text-lg">Soluciones de entrega a medida ejecutadas con precisión militar y cuidado humano.</p>
             </div>
+            
+            {/* Grid de Tarjetas de Servicio - Estilo Limpio/Claro */}
             <div className="grid md:grid-cols-3 gap-8 items-stretch">
                 <ServiceCard icon={Box} delay="0" title="Paquetería Estándar" description="Entrega eficiente de última milla de paquetes esenciales de Amazon a puertas residenciales con seguimiento en tiempo real." />
                 <ServiceCard icon={Clock} delay="150" title="Prime Mismo Día" description="Logística de alta velocidad ejecutando rutas críticas para cumplir con las rigurosas promesas de envío Prime." />
                 <ServiceCard icon={Truck} delay="300" title="Carga y Comercial" description="Manejo especializado para carga más grande, entregas comerciales y rutas de alto volumen con nuestra flota extendida." />
             </div>
+
+            {/* --- GALERÍA DE EQUIPO ELIMINADA PARA SIMPLIFICACIÓN --- */}
+            {/* Si quieres añadirla de nuevo, puedes descomentar la sección anterior. */}
+
         </div>
       </section>
 
@@ -266,29 +322,62 @@ export default function App() {
       {/* JOIN TEAM */}
       <section id="team" className="py-28 bg-white">
         <div className="container mx-auto px-4 max-w-6xl">
-             <div className="bg-slate-50 rounded-[3rem] p-8 md:p-16 overflow-hidden relative border border-slate-100 shadow-xl">
                  <div className="relative z-10 flex flex-col lg:flex-row items-center gap-16">
                     <div className="lg:w-1/2">
-                        <span className="text-blue-600 font-bold tracking-widest uppercase mb-6 block">Carreras en SPF</span>
-                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">ÚNETE A NUESTRO EQUIPO ÉLITE</h2>
-                        <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                            Nosotros proporcionamos la furgoneta, el combustible, el uniforme y la tecnología. Tú pones la conducción. No se necesita licencia comercial para comenzar tu viaje con nosotros.
-                        </p>
+                        {/* 1. Título y Subtítulo */}
+                        <FadeInSection delay="0">
+                            <span className="text-blue-600 font-bold tracking-widest uppercase mb-6 block">Carreras en SPF</span>
+                        </FadeInSection>
+                        <FadeInSection delay="100">
+                            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 leading-tight">ÚNETE A NUESTRO EQUIPO ÉLITE</h2>
+                        </FadeInSection>
+                        
+                        {/* 2. Párrafo Descriptivo */}
+                        <FadeInSection delay="200">
+                            <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                                Nosotros proporcionamos la furgoneta, el combustible, el uniforme y la tecnología. Tú pones la conducción. No se necesita licencia comercial para comenzar tu viaje con nosotros.
+                            </p>
+                        </FadeInSection>
+                        
+                        {/* 3. Lista de Beneficios (escalonada) */}
                         <ul className="space-y-4 mb-10">
-                            <li className="flex items-center gap-3 text-slate-800 font-bold"><CheckCircle className="text-blue-500" /> Pago Semanal y Bonos de Rendimiento</li>
-                            <li className="flex items-center gap-3 text-slate-800 font-bold"><CheckCircle className="text-blue-500" /> Semanas Laborales Consistentes de 4 Días</li>
-                            <li className="flex items-center gap-3 text-slate-800 font-bold"><CheckCircle className="text-blue-500" /> Paquete Completo de Beneficios de Salud</li>
+                            <FadeInSection delay="300">
+                                <li className="flex items-center gap-3 text-slate-800 font-bold"><CheckCircle className="text-amber-500" /> Pago Semanal y Bonos de Rendimiento</li>
+                            </FadeInSection>
+                            <FadeInSection delay="400">
+                                <li className="flex items-center gap-3 text-slate-800 font-bold"><CheckCircle className="text-amber-500" /> Semanas Laborales Consistentes de 4 Días</li>
+                            </FadeInSection>
+                            <FadeInSection delay="500">
+                                <li className="flex items-center gap-3 text-slate-800 font-bold"><CheckCircle className="text-amber-500" /> Paquete Completo de Beneficios de Salud</li>
+                            </FadeInSection>
                         </ul>
-                         {/* BOTÓN AZUL ACTUALIZADO */}
-                         <LedButton onClick={() => setIsApplyModalOpen(true)} primary={false} className="w-full md:w-auto">
-                            INICIAR APLICACIÓN AHORA <ArrowRight size={20} className="ml-2" />
-                        </LedButton>
+                         
+                         {/* 4. Botón CTA */}
+                         <FadeInSection delay="600">
+                             <LedButton onClick={() => setIsApplyModalOpen(true)} primary={false} className="w-full md:w-auto">
+                                INICIAR APLICACIÓN AHORA <ArrowRight size={20} className="ml-2" />
+                            </LedButton>
+                         </FadeInSection>
                     </div>
+                    
+                    {/* Imagen de Carreras (Columna Derecha) */}
                     <div className="lg:w-1/2">
-                        <img src="https://zivotdivny.com/wp-content/uploads/2021/09/Amazon_Delivery_Service_Partner-5b842489c9e77c0050f22ab3.jpg" alt="Conductor SPF" className="rounded-3xl shadow-2xl" />
+                        <FadeInSection delay="700">
+                            <img 
+                                src="https://zivotdivny.com/wp-content/uploads/2021/09/Amazon_Delivery_Service_Partner-5b842489c9e77c0050f22ab3.jpg" 
+                                alt="Conductor SPF" 
+                                className="rounded-3xl shadow-2xl lg:hidden" 
+                            />
+                        </FadeInSection>
+                        <FadeInSection delay="700">
+                            <img 
+                                src="/111.jpg" 
+                                alt="Conductor SPF" 
+                                className="hidden lg:block rounded-3xl shadow-2xl object-cover h-[500px] w-full" 
+                            />
+                        </FadeInSection>
                     </div>
                  </div>
-             </div>
         </div>
       </section>
 
@@ -297,7 +386,6 @@ export default function App() {
         <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-3 gap-12 items-center justify-items-center md:justify-items-start mb-12">
                 <div className="flex flex-col items-center md:items-start">
-                     {/* LOGO NUEVO: URL actualizada y efecto de "glow" al pasar el mouse */}
                      <img src="/spfblanco.png" alt="SPF Logistics" className="h-12 mb-6 opacity-90 transition-all duration-300 cursor-pointer hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
                      <p className="max-w-xs mx-auto md:mx-0">Entregando excelencia, un paquete a la vez. Orgulloso Socio de Servicios de Entrega de Amazon en Wichita, KS.</p>
                 </div>
@@ -352,7 +440,6 @@ export default function App() {
       {/* MODALS */}
       {isApplyModalOpen && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-            {/* Animación slide-in-bottom y centrado vertical */}
             <div className={`bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden relative shadow-2xl transition-all duration-500 animate-[scaleIn_0.3s_ease-out] ${submitSuccess ? 'scale-95' : 'scale-100'}`}>
                 {!isSubmitting && !submitSuccess ? (
                     <div className="flex flex-col h-full max-h-[90vh]">
@@ -391,7 +478,7 @@ export default function App() {
                                  <div className="animate-[scaleIn_0.5s_ease-out]"><CheckCircle className="w-24 h-24 text-green-500" /></div>
                              )}
                         </div>
-                        <h3 className="text-3xl font-black text-slate-900 mb-4">{isSubmitting ? 'ENVIANDO...' : '¡SOLICITUD ENVIADA!'}</h3>
+                        <h3 className="3xl font-black text-slate-900 mb-4">{isSubmitting ? 'ENVIANDO...' : '¡SOLICITUD ENVIADA!'}</h3>
                         <p className="text-slate-600">{isSubmitting ? 'Procesando tu información de forma segura.' : 'Nuestro equipo te contactará pronto.'}</p>
                     </div>
                 )}
@@ -407,7 +494,7 @@ export default function App() {
                 <div className="relative h-[600px] rounded-[2rem] overflow-hidden">
                      {/* NUEVO SRC DEL MAPA */}
                      <iframe 
-                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3154.4284647024!2d-97.23364828857149!3d37.75655051309275!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87bafde4d851c1ab%3A0xa23849e674b940ba!2s4044%20N%20Toben%20St%2C%20Wichita%2C%20KS%2067226%2C%20EE.%20UU.!5e0!3m2!1ses!2sar!4v1762884031627!5m2!1ses!2sar" 
+                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3154.4284647024!2d-97.23364828857149!3d37.75655051309275!2m3!1f0!2f0!2f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87bafde4d851c1ab%3A0xa23849e674b940ba!2s4044%20N%20Toben%20St%2C%20Wichita%2C%20KS%2067226%2C%20EE.%20UU.!5e0!3m2!1ses!2sar!4v1762884031627!5m2!1ses!2sar" 
                          width="100%" 
                          height="100%" 
                          style={{border:0, filter: 'invert(90%) hue-rotate(180deg) contrast(1.2) saturate(0.5)'}} 
