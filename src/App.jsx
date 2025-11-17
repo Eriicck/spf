@@ -3,6 +3,13 @@ import { Menu, X, MapPin, Facebook, Instagram, Linkedin, ArrowRight, CheckCircle
 
 // --- COMPONENTES UTILITARIOS ---
 
+// Lista de Nacionalidades para el campo de selección
+const nationalities = [
+    "Argentina", "Bolivia", "Brasil", "Chile", "Colombia", "Costa Rica", "Cuba", "Ecuador", "El Salvador", 
+    "Guatemala", "Honduras", "México", "Nicaragua", "Panamá", "Paraguay", "Perú", "Puerto Rico", 
+    "República Dominicana", "Uruguay", "Venezuela", "España", "EE. UU.", "Canadá", "Otro"
+];
+
 // Botón LED Mejorado
 const LedButton = ({ children, onClick, className = "", primary = true, type = "button", disabled = false }) => {
   return (
@@ -122,6 +129,7 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [birthDate, setBirthDate] = useState(''); // Estado para la fecha de nacimiento
 
   // ESTRUCTURA ACTUALIZADA: Objeto con URL para escritorio y URL para móvil (conservando tus rutas)
   const heroImages = [
@@ -138,6 +146,27 @@ export default function App() {
       mobile: "/11mobile.jpg" // CAMBIA ESTA RUTA POR TU IMAGEN MÓVIL OPTIMIZADA
     }
   ];
+
+  // Función para formatear la fecha a MM/DD/AAAA
+  const formatDate = (value) => {
+    const numbers = value.replace(/[^\d]/g, ''); // Solo números
+    let formatted = '';
+
+    if (numbers.length > 0) {
+      formatted += numbers.substring(0, 2);
+    }
+    if (numbers.length > 2) {
+      formatted += '/' + numbers.substring(2, 4);
+    }
+    if (numbers.length > 4) {
+      formatted += '/' + numbers.substring(4, 8);
+    }
+    return formatted;
+  };
+
+  const handleDateChange = (e) => {
+    setBirthDate(formatDate(e.target.value));
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -201,8 +230,8 @@ export default function App() {
     <div className="font-sans text-slate-900 bg-slate-50 overflow-x-hidden selection:bg-blue-500/30">
 
       {/* HEADER */}
-      {/* CAMBIO FLICKER: 'absolute' en móvil, 'md:fixed' en desktop */}
-      <header className={`absolute md:fixed w-full top-0 z-40 transition-all duration-300 bg-transparent py-6 ${scrolled ? 'md:bg-slate-950/95 md:backdrop-blur-md md:py-3 md:shadow-lg' : ''}`}>
+      {/* CAMBIO: Se ajusta el fondo y el blur para el efecto de transparencia al hacer scroll en escritorio. */}
+      <header className={`absolute md:fixed w-full top-0 z-40 transition-all duration-300 bg-transparent py-6 ${scrolled ? 'md:bg-slate-950/90 md:backdrop-blur-sm md:py-3 md:shadow-lg' : ''}`}>
         <div className="container mx-auto px-4 flex justify-center md:justify-between items-center relative">
           {/* TAMAÑO MÓVIL AUMENTADO */}
           {/* Uso de logo local /spfblanco.png */}
@@ -420,7 +449,7 @@ export default function App() {
                     {/* Imagen de Carreras (Columna Derecha) */}
                     <div className="lg:w-1/2">
                         <FadeInSection delay="700">
-                            {/* IMAGEN MÓVIL (h-64 para un aspecto más horizontal) */}
+                            {/* IMAGEN MÓVIL (h-full ajustado para el aspecto horizontal que quieres) */}
                             <img 
                                 src="/6.jpg" 
                                 alt="Conductor SPF" 
@@ -459,12 +488,12 @@ export default function App() {
                 </div>
                 <div className="flex flex-col items-center md:items-end w-full">
                     <button onClick={() => setIsMapModalOpen(true)} className="flex items-center gap-2 text-blue-400 font-bold hover:text-white transition-colors mb-6">
-                        <MapPin size={18} /> Ver Mapa de Estación de Entrega
+                        <MapPin size={18} /> Ver Estación de Entrega
                     </button>
                      <div className="flex gap-6">
-                        <a href="#" className="text-slate-400 hover:text-white transition-colors p-3 bg-white/5 rounded-full hover:bg-blue-600"><Facebook size={20} /></a>
-                        <a href="#" className="text-slate-400 hover:text-white transition-colors p-3 bg-white/5 rounded-full hover:bg-pink-600"><Instagram size={20} /></a>
-                        <a href="#" className="text-slate-400 hover:text-white transition-colors p-3 bg-white/5 rounded-full hover:bg-blue-500"><Linkedin size={20} /></a>
+                        <a href="https://www.facebook.com/SPFLogistics" className="text-slate-400 hover:text-white transition-colors p-3 bg-white/5 rounded-full hover:bg-blue-600"><Facebook size={20} /></a>
+                        <a href="https://www.instagram.com/spflogistics.llc/" className="text-slate-400 hover:text-white transition-colors p-3 bg-white/5 rounded-full hover:bg-pink-600"><Instagram size={20} /></a>
+                        <a href="https://www.indeed.com/cmp/Spf-Logistics-LLC?campaignid=mobvjcmp&from=mobviewjob&tk=1j9qpaqiogc7280b&fromjk=2cfa46cd012f84c2" className="text-slate-400 hover:text-white transition-colors p-3 bg-white/5 rounded-full hover:bg-blue-500"><Linkedin size={20} /></a>
                     </div>
                 </div>
             </div>
@@ -513,8 +542,28 @@ export default function App() {
                                     <div><label className="text-sm font-bold text-slate-900">Apellido *</label><input type="text" required className="w-full p-3 mt-1 bg-slate-100 border-0 rounded-xl focus:ring-2 focus:ring-blue-500" /></div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                     <div><label className="text-sm font-bold text-slate-900">Fecha Nac. *</label><input type="text" placeholder="MM/DD/AAAA" required className="w-full p-3 mt-1 bg-slate-100 border-0 rounded-xl focus:ring-2 focus:ring-blue-500" /></div>
-                                     <div><label className="text-sm font-bold text-slate-900">Nacionalidad *</label><input type="text" required placeholder="Escribe aquí..." className="w-full p-3 mt-1 bg-slate-100 border-0 rounded-xl focus:ring-2 focus:ring-blue-500" /></div>
+                                     <div>
+                                        <label className="text-sm font-bold text-slate-900">Fecha Nac. (MM/DD/AAAA) *</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="MM/DD/AAAA" 
+                                            required 
+                                            maxLength="10" 
+                                            value={birthDate}
+                                            onChange={handleDateChange} // Función de formato automático
+                                            className="w-full p-3 mt-1 bg-slate-100 border-0 rounded-xl focus:ring-2 focus:ring-blue-500" 
+                                        />
+                                     </div>
+                                     <div>
+                                        <label className="text-sm font-bold text-slate-900">Nacionalidad *</label>
+                                        {/* Campo de selección para garantizar datos limpios */}
+                                        <select required className="w-full p-3 mt-1 bg-slate-100 border-0 rounded-xl focus:ring-2 focus:ring-blue-500 appearance-none">
+                                            <option value="">Selecciona tu Nacionalidad</option>
+                                            {nationalities.map(n => (
+                                                <option key={n} value={n}>{n}</option>
+                                            ))}
+                                        </select>
+                                     </div>
                                 </div>
                                 <div><label className="text-sm font-bold text-slate-900">Número de Licencia *</label><input type="text" required className="w-full p-3 mt-1 bg-slate-100 border-0 rounded-xl focus:ring-2 focus:ring-blue-500" /></div>
                                 <div><label className="text-sm font-bold text-slate-900">SSN (Seguro Social) *</label><input type="password" required className="w-full p-3 mt-1 bg-slate-100 border-0 rounded-xl focus:ring-2 focus:ring-blue-500" placeholder="XXX-XX-XXXX"/></div>
@@ -545,33 +594,44 @@ export default function App() {
         </div>
       )}
 
+      {/* MODAL MAPA SIMPLIFICADO: Ahora solo muestra la imagen como vista previa y un botón grande para ir a Google Maps. */}
       {isMapModalOpen && (
         <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[100] flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && setIsMapModalOpen(false)}>
              <div className="bg-slate-900 p-2 rounded-[2.5rem] w-full max-w-4xl relative animate-[scaleIn_0.3s_ease-out] border border-white/10 shadow-2xl">
                 <button onClick={() => setIsMapModalOpen(false)} className="absolute top-6 right-6 bg-white text-black w-12 h-12 rounded-full z-20 flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><X size={24}/></button>
-                <div className="relative h-[600px] rounded-[2rem] overflow-hidden">
-                     {/* NUEVO SRC DEL MAPA */}
-                     <iframe 
-                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3154.4284647024!2d-97.23364828857149!3d37.75655051309275!2m3!1f0!2f0!0f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87bafde4d851c1ab%3A0xa23849e674b940ba!2s4044%20N%20Toben%20St%2C%20Wichita%2C%20KS%2067226%2C%20EE.%20UU.!5e0!3m2!1ses!2sar!4v1762884031627!5m2!1ses!2sar" 
-                         width="100%" 
-                         height="100%" 
-                         style={{border:0, filter: 'invert(90%) hue-rotate(180deg) contrast(1.2) saturate(0.5)'}} 
-                         allowFullScreen="" 
-                         loading="lazy" 
-                         referrerPolicy="no-referrer-when-downgrade">
-                     </iframe>
-                     <div className="absolute bottom-10 left-0 right-0 flex justify-center pointer-events-none">
-                         <div className="pointer-events-auto">
-                            {/* NUEVO LINK DE DIRECCIONES */}
+                
+                {/* Contenedor de la imagen y el título */}
+                <div className="p-4">
+                    <h3 className="text-2xl font-black text-white mb-4 text-center">Estación de Entrega</h3>
+                    <p className="text-slate-400 text-center mb-6">4044 N Toben St, Wichita, KS 67226</p>
+                    
+                    {/* Contenedor de Imagen (Vista Previa) */}
+                    <div className="relative overflow-hidden rounded-2xl shadow-xl border-2 border-blue-500/50">
+                        {/* IMAGEN DE ESCRITORIO (Mayor altura) */}
+                        <img 
+                             src="/map.png" // Ruta de imagen cambiada a /map.png
+                             alt="Vista exterior de la Estación de Entrega" 
+                             className="hidden lg:block w-full h-[400px] object-cover" // h-[400px] para escritorio
+                        />
+                        {/* IMAGEN DE MÓVIL (Menor altura, para evitar que sea exagerada) */}
+                        <img 
+                             src="/map.png" // Ruta de imagen cambiada a /map.png
+                             alt="Vista exterior de la Estación de Entrega" 
+                             className="lg:hidden w-full h-[220px] object-cover" // h-[220px] para móvil (más compacto)
+                        />
+
+                        {/* Botón en la parte inferior de la imagen */}
+                        <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4">
                             <LedButton 
-                                onClick={() => window.open("https://www.google.com/maps/dir//4044+N+Toben+St,+Wichita,+KS+67226/", "_blank")} 
                                 primary={false} 
-                                className="scale-110 shadow-2xl shadow-black/50">
-                                <Navigation size={20} /> CÓMO LLEGAR
+                                className="scale-100 shadow-2xl shadow-black/50"
+                                onClick={() => window.open("https://www.google.com/maps/dir//4044+N+Toben+St,+Wichita,+KS+67226/", "_blank")}>
+                                <Navigation size={20} /> VER EN GOOGLE MAPS
                             </LedButton>
-                         </div>
-                     </div>
+                        </div>
+                    </div>
                 </div>
+
              </div>
         </div>
       )}
