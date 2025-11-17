@@ -123,10 +123,20 @@ export default function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  // ESTRUCTURA ACTUALIZADA: Objeto con URL para escritorio y URL para móvil (conservando tus rutas)
   const heroImages = [
-    "https://assets.aboutamazon.com/9c/7b/5e02715f4a97b4c27100614cafc2/hero3.jpg",
-    "https://zivotdivny.com/wp-content/uploads/2021/09/Amazon_Delivery_Service_Partner-5b842489c9e77c0050f22ab3.jpg",
-    "https://www.electrive.com/media/2024/05/volvo-trucks-vnr-electric-e-lkw-electric-truck-amazon-kalifornien-california-usa-2024-01-min-1400x933.jpg.webp"
+    { 
+      desktop: "/banner1.jpg", 
+      mobile: "/7banner.jpg" // CAMBIA ESTA RUTA POR TU IMAGEN MÓVIL OPTIMIZADA
+    },
+    { 
+      desktop: "https://www.electrive.com/media/2024/05/volvo-trucks-vnr-electric-e-lkw-electric-truck-amazon-kalifornien-california-usa-2024-01-min-1400x933.jpg.webp", 
+      mobile: "/4.jpg" // CAMBIA ESTA RUTA POR TU IMAGEN MÓVIL OPTIMIZADA
+    },
+    { 
+      desktop: "/11especial.jpg", 
+      mobile: "/11mobile.jpg" // CAMBIA ESTA RUTA POR TU IMAGEN MÓVIL OPTIMIZADA
+    }
   ];
 
   useEffect(() => {
@@ -134,7 +144,7 @@ export default function App() {
     window.addEventListener('scroll', handleScroll);
     const slideInterval = setInterval(() => setCurrentHeroSlide(prev => (prev + 1) % heroImages.length), 5000);
     return () => { window.removeEventListener('scroll', handleScroll); clearInterval(slideInterval); };
-  }, []);
+  }, [heroImages.length]);
 
   const handleSubmit = (e) => {
       e.preventDefault(); setIsSubmitting(true);
@@ -155,10 +165,37 @@ export default function App() {
       .animate-slide-in-bottom { animation: slideInBottom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
       @keyframes slideInBottomRight { from { opacity: 0; transform: translate(20px, 20px) scale(0.95); } to { opacity: 1; transform: translate(0, 0) scale(1); } }
       .animate-slide-in-br { animation: slideInBottomRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      
+      /* Media Query CSS para cambiar el fondo dinámicamente */
+      .hero-slide {
+          background-size: cover;
+          background-position: center;
+      }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
   }, []);
+
+  // Hook para detectar si la pantalla es móvil (menos de 1024px)
+  // Utilizamos window.matchMedia dentro de useEffect para asegurar que se ejecute en el cliente.
+  const isMobile = typeof window !== 'undefined' ? window.matchMedia('(max-width: 1023px)').matches : false;
+  const [isMobileView, setIsMobileView] = useState(isMobile);
+  
+  useEffect(() => {
+      const mediaQuery = window.matchMedia('(max-width: 1023px)');
+      const handleResize = (e) => setIsMobileView(e.matches);
+      
+      mediaQuery.addEventListener('change', handleResize);
+      setIsMobileView(mediaQuery.matches); // Establecer el estado inicial
+
+      return () => mediaQuery.removeEventListener('change', handleResize);
+  }, []);
+  
+  const getBackgroundImageUrl = (imageObject) => {
+    // Si la vista es móvil y se ha definido una URL móvil, úsala. De lo contrario, usa la de escritorio.
+    // Esto es lo que permite el responsive loading de las imágenes.
+    return isMobileView && imageObject.mobile ? imageObject.mobile : imageObject.desktop;
+  };
 
   return (
     <div className="font-sans text-slate-900 bg-slate-50 overflow-x-hidden selection:bg-blue-500/30">
@@ -168,6 +205,7 @@ export default function App() {
       <header className={`absolute md:fixed w-full top-0 z-40 transition-all duration-300 bg-transparent py-6 ${scrolled ? 'md:bg-slate-950/95 md:backdrop-blur-md md:py-3 md:shadow-lg' : ''}`}>
         <div className="container mx-auto px-4 flex justify-center md:justify-between items-center relative">
           {/* TAMAÑO MÓVIL AUMENTADO */}
+          {/* Uso de logo local /spfblanco.png */}
           <img src="/spfblanco.png" alt="SPF Logistics" className="h-12 md:h-14 w-auto transition-all duration-300 cursor-pointer hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
           <nav className="hidden md:flex items-center gap-8 font-medium text-sm text-white tracking-wider">
             <a href="#home" className="hover:text-blue-400 transition-colors">INICIO</a>
@@ -181,8 +219,9 @@ export default function App() {
       {/* HERO SECTION */}
       <section id="home" className="relative h-[100svh] min-h-[600px] flex items-center bg-slate-900">
         {heroImages.map((img, index) => (
-          <div key={index} className={`absolute inset-0 transition-opacity duration-[2000ms] ease-in-out ${index === currentHeroSlide ? 'opacity-100' : 'opacity-0'}`}
-               style={{ backgroundImage: `url('${img}')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          // USO DE getBackgroundImageUrl para la URL dinámica
+          <div key={index} className={`absolute inset-0 hero-slide transition-opacity duration-[2000ms] ease-in-out ${index === currentHeroSlide ? 'opacity-100' : 'opacity-0'}`}
+               style={{ backgroundImage: `url('${getBackgroundImageUrl(img)}')` }} />
         ))}
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent" />
         <div className="container mx-auto px-4 relative z-10 mt-10 md:mt-20">
@@ -190,7 +229,7 @@ export default function App() {
             {/* CAMBIO: "Píldora" con acento amarillo de Amazon */}
             <div className="inline-flex items-center gap-3 py-2 px-4 rounded-full bg-amber-400/10 backdrop-blur-md border border-amber-400/20 text-amber-300 text-sm font-bold uppercase tracking-widest mb-8">
               <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span></span>
-              Socio Oficial DSP de Amazon • Wichita, KS
+              Socio Oficial DSP
             </div>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-none mb-8 tracking-tight drop-shadow-2xl">
               ENTREGA EL <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">FUTURO</span>
@@ -235,22 +274,36 @@ export default function App() {
                   </div>
 
                   {/* Columna Derecha: Imagen de Fondo sutil y Corte Diagonal */}
-                  <div className="lg:col-span-2 relative w-full h-full min-h-[300px] lg:min-h-full order-1 lg:order-2"> {/* order-1 en móvil */}
+                  <div className="lg:col-span-2 relative w-full h-[300px] lg:h-full lg:min-h-full order-1 lg:order-2"> {/* order-1 en móvil */}
                       {/* Imagen de Fondo (textura geométrica) */}
+                      {/* Uso de logo local /logo-facebook.jpg */}
                       <div className="absolute inset-0 bg-cover bg-center opacity-[0.15]" style={{ backgroundImage: `url('/logo-facebook.jpg')` }} />
                       {/* Overlay azul oscuro para mantener el estilo de la caja */}
                       <div className="absolute inset-0 bg-slate-900/95" /> 
 
-                      {/* Imagen de Contenido (Conductor) con CORTE DIAGONAL */}
+                      {/* IMPLEMENTACIÓN DE DOBLE IMAGEN CON OCULTACIÓN RESPONSIVE */}
+                      
+                      {/* Imagen para DESKTOP (Amplia - Se ve bien con el corte diagonal) */}
                       <img 
-                          src="6.jpg" // <-- ¡AQUÍ PUEDES CAMBIAR LA IMAGEN!
-                          alt="Conductor de Amazon en un campo" 
-                          className="w-full h-full object-cover transform scale-[1.05] filter brightness-[0.8] relative z-10"
+                          src="/111.jpg" // URL de imagen panorámica para escritorio
+                          alt="Camión de logística de SPF Logistics" 
+                          className="w-full h-full object-cover transform scale-[1.05] filter brightness-[0.8] relative z-10 hidden lg:block" // Oculta en móvil
                           style={{
                               // Aplica el corte diagonal a la imagen en desktop. 
                               clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)',
                           }}
                       />
+                       {/* Imagen para MÓVIL (Más cuadrada/Vertical - Se ajusta mejor a h-300px) */}
+                      <img 
+                          src="/111.jpg" // URL de imagen más vertical para móvil
+                          alt="Conductor de Amazon entregando un paquete" 
+                          className="w-full h-full object-cover transform scale-[1.05] filter brightness-[0.8] relative z-10 lg:hidden" // Muestra en móvil
+                          style={{
+                              // Aplica el corte diagonal a la imagen en desktop. 
+                              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)',
+                          }}
+                      />
+                      
                       {/* Estilos específicos para el corte diagonal en desktop */}
                       <style jsx="true">{`
                         @media (min-width: 1024px) {
@@ -269,6 +322,7 @@ export default function App() {
       <section id="services" className="py-28 bg-gray-50 relative overflow-hidden">
         
         {/* Marcador de Estilo Geométrico/Grid */}
+        {/* Uso de logo local /logo-facebook.jpg */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
             <img src="/logo-facebook.jpg" alt="" className="w-full h-full object-cover opacity-50 filter grayscale contrast-150" />
         </div>
@@ -289,16 +343,18 @@ export default function App() {
             </div>
 
             {/* --- GALERÍA DE EQUIPO ELIMINADA PARA SIMPLIFICACIÓN --- */}
-            {/* Si quieres añadirla de nuevo, puedes descomentar la sección anterior. */}
 
         </div>
       </section>
 
-      {/* ACHIEVEMENTS */}
+      {/* ACHIEVEMENTS - CORREGIDO EL PARALLAX */}
       <section className="py-32 relative overflow-hidden flex items-center">
+        {/* CORRECCIÓN: Quitamos la limitación de altura del contenedor principal y el background lo dejamos en el div absoluto. */}
         <div className="absolute inset-0 bg-fixed bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&q=80&w=1920')" }} />
         <div className="absolute inset-0 bg-slate-950/75 mix-blend-multiply" /> 
-        <div className="container mx-auto px-4 relative z-10 text-center">
+        
+        {/* Añadimos un min-h para forzar la altura mínima del contenido y evitar el "corte gris" en scroll. */}
+        <div className="container mx-auto px-4 relative z-10 text-center min-h-[400px] flex flex-col justify-center">
             <FadeInSection>
                 <h2 className="text-white/80 text-2xl font-bold mb-16 tracking-[0.2em] uppercase">Hitos de Rendimiento</h2>
             </FadeInSection>
@@ -319,7 +375,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* JOIN TEAM */}
+      {/* JOIN TEAM (CARRERAS EN SPF) - IMAGEN MÓVIL AJUSTADA A h-64 */}
       <section id="team" className="py-28 bg-white">
         <div className="container mx-auto px-4 max-w-6xl">
                  <div className="relative z-10 flex flex-col lg:flex-row items-center gap-16">
@@ -342,6 +398,7 @@ export default function App() {
                         {/* 3. Lista de Beneficios (escalonada) */}
                         <ul className="space-y-4 mb-10">
                             <FadeInSection delay="300">
+                                {/* CAMBIO: Iconos de Check en amarillo Amazon */}
                                 <li className="flex items-center gap-3 text-slate-800 font-bold"><CheckCircle className="text-amber-500" /> Pago Semanal y Bonos de Rendimiento</li>
                             </FadeInSection>
                             <FadeInSection delay="400">
@@ -363,15 +420,16 @@ export default function App() {
                     {/* Imagen de Carreras (Columna Derecha) */}
                     <div className="lg:w-1/2">
                         <FadeInSection delay="700">
+                            {/* IMAGEN MÓVIL (h-64 para un aspecto más horizontal) */}
                             <img 
-                                src="https://zivotdivny.com/wp-content/uploads/2021/09/Amazon_Delivery_Service_Partner-5b842489c9e77c0050f22ab3.jpg" 
+                                src="/6.jpg" 
                                 alt="Conductor SPF" 
-                                className="rounded-3xl shadow-2xl lg:hidden" 
+                                className="rounded-3xl shadow-2xl lg:hidden h-full w-full object-cover" 
                             />
                         </FadeInSection>
                         <FadeInSection delay="700">
                             <img 
-                                src="/111.jpg" 
+                                src="/chofer.jpg" 
                                 alt="Conductor SPF" 
                                 className="hidden lg:block rounded-3xl shadow-2xl object-cover h-[500px] w-full" 
                             />
@@ -386,6 +444,7 @@ export default function App() {
         <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-3 gap-12 items-center justify-items-center md:justify-items-start mb-12">
                 <div className="flex flex-col items-center md:items-start">
+                     {/* Uso de logo local /spfblanco.png */}
                      <img src="/spfblanco.png" alt="SPF Logistics" className="h-12 mb-6 opacity-90 transition-all duration-300 cursor-pointer hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
                      <p className="max-w-xs mx-auto md:mx-0">Entregando excelencia, un paquete a la vez. Orgulloso Socio de Servicios de Entrega de Amazon en Wichita, KS.</p>
                 </div>
@@ -486,7 +545,6 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DEL MAPA ACTUALIZADO */}
       {isMapModalOpen && (
         <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[100] flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && setIsMapModalOpen(false)}>
              <div className="bg-slate-900 p-2 rounded-[2.5rem] w-full max-w-4xl relative animate-[scaleIn_0.3s_ease-out] border border-white/10 shadow-2xl">
@@ -494,7 +552,7 @@ export default function App() {
                 <div className="relative h-[600px] rounded-[2rem] overflow-hidden">
                      {/* NUEVO SRC DEL MAPA */}
                      <iframe 
-                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3154.4284647024!2d-97.23364828857149!3d37.75655051309275!2m3!1f0!2f0!2f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87bafde4d851c1ab%3A0xa23849e674b940ba!2s4044%20N%20Toben%20St%2C%20Wichita%2C%20KS%2067226%2C%20EE.%20UU.!5e0!3m2!1ses!2sar!4v1762884031627!5m2!1ses!2sar" 
+                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3154.4284647024!2d-97.23364828857149!3d37.75655051309275!2m3!1f0!2f0!0f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87bafde4d851c1ab%3A0xa23849e674b940ba!2s4044%20N%20Toben%20St%2C%20Wichita%2C%20KS%2067226%2C%20EE.%20UU.!5e0!3m2!1ses!2sar!4v1762884031627!5m2!1ses!2sar" 
                          width="100%" 
                          height="100%" 
                          style={{border:0, filter: 'invert(90%) hue-rotate(180deg) contrast(1.2) saturate(0.5)'}} 
